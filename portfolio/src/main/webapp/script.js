@@ -17,7 +17,7 @@
  */
 function addRandomGreeting() {
   const greetings =
-      ['I am the god of destruction!', 'Give him pretty hair', 'I know tongue fu', 'Come and get it you Halloween Turkey!'];
+      ['I am the god of destruction!', 'Give him pretty hair', 'I know tongue fu', 'Come and get it you Halloween turkey!'];
 
   // Pick a random greeting.
   const greeting = greetings[Math.floor(Math.random() * greetings.length)];
@@ -25,4 +25,10 @@ function addRandomGreeting() {
   // Add it to the page.
   const greetingContainer = document.getElementById('greeting-container');
   greetingContainer.innerText = greeting;
+}
+
+async function getGreeting(){
+    const response = await fetch('/data');
+    const greeting = await response.text();
+    document.getElementById('hello-container').innerText = greeting;
 }
