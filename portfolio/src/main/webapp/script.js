@@ -32,3 +32,26 @@ async function getGreeting(){
     const greeting = await response.text();
     document.getElementById('hello-container').innerText = greeting;
 }
+/**
+ * Fetches messages from the servers and adds them to the DOM.
+ */
+async function getGreetings() {
+  fetch('/data').then(response => response.json()).then((msg) => {
+   
+    const statsListElement = document.getElementById('hello-container');
+    statsListElement.innerHTML = '';
+    statsListElement.appendChild(
+        createListElement('Sender: ' + msg.sender));
+    statsListElement.appendChild(
+        createListElement('Message: ' + msg.message));
+    statsListElement.appendChild(
+        createListElement('To: ' + msg.recipient));
+  });
+}
+
+/** Creates an <li> element containing text. */
+function createListElement(text) {
+  const liElement = document.createElement('li');
+  liElement.innerText = text;
+  return liElement;
+}

@@ -20,13 +20,46 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+import java.util.ArrayList;
+
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
+    public class Message{
+        String sender, message, recipient;
+        public Message(String sndr, String msg, String rcpnt){
+            sender = sndr;
+            message = msg;
+            recipient = rcpnt;
+        }
+    }
 
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html;");
-    response.getWriter().println("Hello Steven!");
-  }
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //response.setContentType("text/html;");
+        //response.getWriter().println("Hello Steven!");
+        //create arraylist with sample inputs
+        ArrayList<String> sampleMessage = new ArrayList<String>();
+        sampleMessage.add("Steven");
+        sampleMessage.add("Nice day today");
+        sampleMessage.add("You");
+
+        // Convert the message to JSON
+        Message nMessage = new Message(sampleMessage.get(0), sampleMessage.get(1), sampleMessage.get(2));
+        String json = convertToJsonUsingGson(nMessage);
+
+        // Send the JSON as the response
+        response.setContentType("application/json;");
+        response.getWriter().println(json);
+    }
+
+    /**
+   * Converts a ServerStats instance into a JSON string using the Gson library
+   */
+    private String convertToJsonUsingGson(Message messages) {
+        Gson gson = new Gson();
+        String json = gson.toJson(messages);
+        return json;
+    }
 }
