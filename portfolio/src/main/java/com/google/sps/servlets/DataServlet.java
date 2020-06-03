@@ -22,9 +22,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 import java.util.ArrayList;
+import java.util.List;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
 
 import java.io.*;
 
@@ -33,35 +37,33 @@ import java.io.*;
 public class DataServlet extends HttpServlet {
     public class Message{
         String sender, message, recipient;
-        public Message(String sndr, String msg, String rcpnt){
+        public Message(String sndr, String msg){
             sender = sndr;
             message = msg;
-            recipient = rcpnt;
         }
     }
-    public ArrayList<String> sampleMessage = new ArrayList<String>();
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //response.setContentType("text/html;");
-        //response.getWriter().println("Hello Steven!");
-        //create arraylist with sample inputs
         
-        //sampleMessage.add("Steven");
-        //sampleMessage.add("Nice day today");
-        //sampleMessage.add("You");
 
-        //TODO figure out how to get multiple messages on page
+        Query query = new Query("Comment").addSort("time", SortDirection.DESCENDING);
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        PreparedQuery results = datastore.prepare(query);
 
-        //for(int i = 0; i < sampleMessage.size(); i++){
-            // Convert the message to JSON
-            Message nMessage = new Message("Anonymous", sampleMessage.get(sampleMessage.size()-1), "You");
-            String json = convertToJsonUsingGson(nMessage);
+        List<Message> messages = new ArrayList<>();
+        for (Entity entity : results.asIterable()) {
+            String comment = (String) entity.getProperty("text");
+            String sender = (String) entity.getProperty("sender");
+            Message nComment = new Message(sender, comment);
+            messages.add(nComment);
             
-            // Send the JSON as the response
-            response.setContentType("application/json;");
-            response.getWriter().println(json);
-        //}
+            
+        }
+        Gson gson = new Gson();
+        response.setContentType("application/json;");
+        response.getWriter().println(gson.toJson(messages));
+        
     }
 
     /**
@@ -85,12 +87,13 @@ public class DataServlet extends HttpServlet {
         response.setContentType("text/html;");
         response.getWriter().println(text);
 
-    // Add comment to arraylist
-        sampleMessage.add(text);
+    // Add comment to datastore
+        long timestamp = System.currentTimeMillis();
 
         Entity commentEntity = new Entity("Comment");
         commentEntity.setProperty("sender", "Steven");
         commentEntity.setProperty("text", text);
+        commentEntity.setProperty("time", timestamp);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(commentEntity);
 
