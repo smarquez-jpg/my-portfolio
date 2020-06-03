@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 
+import java.io.*;
+
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
@@ -34,24 +36,29 @@ public class DataServlet extends HttpServlet {
             recipient = rcpnt;
         }
     }
-
+    public ArrayList<String> sampleMessage = new ArrayList<String>();
+    
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //response.setContentType("text/html;");
         //response.getWriter().println("Hello Steven!");
         //create arraylist with sample inputs
-        ArrayList<String> sampleMessage = new ArrayList<String>();
-        sampleMessage.add("Steven");
-        sampleMessage.add("Nice day today");
-        sampleMessage.add("You");
+        
+        //sampleMessage.add("Steven");
+        //sampleMessage.add("Nice day today");
+        //sampleMessage.add("You");
 
-        // Convert the message to JSON
-        Message nMessage = new Message(sampleMessage.get(0), sampleMessage.get(1), sampleMessage.get(2));
-        String json = convertToJsonUsingGson(nMessage);
+        //TODO figure out how to get multiple messages on page
 
-        // Send the JSON as the response
-        response.setContentType("application/json;");
-        response.getWriter().println(json);
+        //for(int i = 0; i < sampleMessage.size(); i++){
+            // Convert the message to JSON
+            Message nMessage = new Message("Anonymous", sampleMessage.get(sampleMessage.size()-1), "You");
+            String json = convertToJsonUsingGson(nMessage);
+            
+            // Send the JSON as the response
+            response.setContentType("application/json;");
+            response.getWriter().println(json);
+        //}
     }
 
     /**
@@ -61,5 +68,33 @@ public class DataServlet extends HttpServlet {
         Gson gson = new Gson();
         String json = gson.toJson(messages);
         return json;
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // Get the input from the form.
+        String text = getParameter(request, "text-input", "");
+
+    // Respond with the result.
+        response.setContentType("text/html;");
+        response.getWriter().println(text);
+
+    // Add comment to arraylist
+        sampleMessage.add(text);
+
+    // Redirect back to the HTML page.
+        response.sendRedirect("/index.html");
+    }
+
+  /**
+   * @return the request parameter, or the default value if the parameter
+   *         was not specified by the client
+   */
+    private String getParameter(HttpServletRequest request, String name, String defaultValue) {
+        String value = request.getParameter(name);
+        if (value == null) {
+            return defaultValue;
+        }
+        return value;
     }
 }

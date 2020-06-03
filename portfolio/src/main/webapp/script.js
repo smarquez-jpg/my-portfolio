@@ -35,17 +35,17 @@ async function getGreeting(){
 /**
  * Fetches messages from the servers and adds them to the DOM.
  */
-async function getGreetings() {
-  fetch('/data').then(response => response.json()).then((msg) => {
+async function getComments() {
+    fetch('/data').then(response => response.json()).then((msg) => {
    
-    const statsListElement = document.getElementById('hello-container');
+    const statsListElement = document.getElementById('comments-container');
     statsListElement.innerHTML = '';
     statsListElement.appendChild(
         createListElement('Sender: ' + msg.sender));
     statsListElement.appendChild(
         createListElement('Message: ' + msg.message));
     statsListElement.appendChild(
-        createListElement('To: ' + msg.recipient));
+        createListElement('Recipient: ' + msg.recipient));
   });
 }
 
