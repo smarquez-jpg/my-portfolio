@@ -22,6 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 import java.util.ArrayList;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 
 import java.io.*;
 
@@ -72,6 +75,9 @@ public class DataServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    
+    
+    
     // Get the input from the form.
         String text = getParameter(request, "text-input", "");
 
@@ -81,6 +87,12 @@ public class DataServlet extends HttpServlet {
 
     // Add comment to arraylist
         sampleMessage.add(text);
+
+        Entity commentEntity = new Entity("Comment");
+        commentEntity.setProperty("sender", "Steven");
+        commentEntity.setProperty("text", text);
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        datastore.put(commentEntity);
 
     // Redirect back to the HTML page.
         response.sendRedirect("/index.html");
