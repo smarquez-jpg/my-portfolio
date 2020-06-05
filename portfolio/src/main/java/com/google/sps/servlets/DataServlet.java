@@ -42,16 +42,17 @@ public class DataServlet extends HttpServlet {
             message = msg;
         }
     }
-    
+    List<Message> messages = new ArrayList<>();
+    int numberOfComments = 0;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
-
+        
         Query query = new Query("Comment").addSort("time", SortDirection.DESCENDING);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         PreparedQuery results = datastore.prepare(query);
 
-        List<Message> messages = new ArrayList<>();
         for (Entity entity : results.asIterable()) {
             String comment = (String) entity.getProperty("text");
             String sender = (String) entity.getProperty("sender");
@@ -62,9 +63,21 @@ public class DataServlet extends HttpServlet {
         }
         Gson gson = new Gson();
         response.setContentType("application/json;");
-        response.getWriter().println(gson.toJson(messages));
+        List<Message> limitedMessages = new ArrayList<>();
+        if(numberOfComments == 0){
+            response.getWriter().println(gson.toJson(limitedMessages));
+
+        }
+        else {
+            for(int i = 0; i < numberOfComments; i++){
+                limitedMessages.add(messages.get(i));
+            }
+            response.getWriter().println(gson.toJson(limitedMessages));
+
+        }
         
     }
+    
 
     /**
    * Converts a ServerStats instance into a JSON string using the Gson library
@@ -82,7 +95,12 @@ public class DataServlet extends HttpServlet {
     
     // Get the input from the form.
         String text = getParameter(request, "text-input", "");
-
+        numberOfComments = getNumberOfComments(request);
+        if (numberOfComments == -1) {
+            response.setContentType("text/html");
+            response.getWriter().println("Please enter an integer between 1 and 100.");
+            return;
+        }
     // Respond with the result.
         response.setContentType("text/html;");
         response.getWriter().println(text);
@@ -111,5 +129,27 @@ public class DataServlet extends HttpServlet {
             return defaultValue;
         }
         return value;
+    }
+
+    /* Returns number of comments to display */
+    private int getNumberOfComments(HttpServletRequest request) {
+    // Get the input from the form.
+        String numberOfCommentsString = request.getParameter("comments-choice");
+    // Convert the input to an int.
+        int numberOfComments;
+        try {
+        numberOfComments = Integer.parseInt(numberOfCommentsString);
+        } catch (NumberFormatException e) {
+        System.err.println("Could not convert to int: " + numberOfCommentsString);
+        return -1;
+        }
+        /*
+    // Check that the input is between 1 and size of messages.
+        if (numberOfComments < 1 || numberOfComments > messages.size()) {
+            System.err.println("Number choice is out of range: " + numberOfCommentsString);
+            return -1;
+        }*/
+
+        return numberOfComments;
     }
 }

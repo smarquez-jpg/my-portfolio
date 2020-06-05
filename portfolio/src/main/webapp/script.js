@@ -43,9 +43,9 @@ async function getComments() {
     msgs.forEach((msg) => {
 
         statsListElement.appendChild(
-            createListElement('Sender: ' + msg.sender));
-        statsListElement.appendChild(
-            createListElement('Message: ' + msg.message));
+            createListElement(msg.sender + ': ' + msg.message));
+        //statsListElement.appendChild(
+           // createListElement('Message: ' + msg.message));
     })
     
   });
@@ -56,4 +56,8 @@ function createListElement(text) {
   const liElement = document.createElement('li');
   liElement.innerText = text;
   return liElement;
+}
+
+function deleteData(){
+    fetch('/delete-data', {method: 'POST'}).then(getComments());
 }
