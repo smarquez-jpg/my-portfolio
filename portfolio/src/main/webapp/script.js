@@ -41,11 +41,8 @@ async function getComments() {
     const statsListElement = document.getElementById('comments-container');
     statsListElement.innerHTML = '';
     msgs.forEach((msg) => {
-
         statsListElement.appendChild(
             createListElement(msg.sender + ': ' + msg.message));
-        //statsListElement.appendChild(
-           // createListElement('Message: ' + msg.message));
     })
     
   });
