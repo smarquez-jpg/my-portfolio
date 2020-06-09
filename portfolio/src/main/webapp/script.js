@@ -17,7 +17,7 @@
  */
 function addRandomGreeting() {
   const greetings =
-      ['I am the god of destruction!', 'Give him pretty hair', 'I know tongue fu', 'Come and get it you Halloween Turkey!'];
+      ['I am the god of destruction!', 'Give him pretty hair', 'I know tongue fu', 'Come and get it you Halloween turkey!'];
 
   // Pick a random greeting.
   const greeting = greetings[Math.floor(Math.random() * greetings.length)];
@@ -25,4 +25,36 @@ function addRandomGreeting() {
   // Add it to the page.
   const greetingContainer = document.getElementById('greeting-container');
   greetingContainer.innerText = greeting;
+}
+
+async function getGreeting(){
+    const response = await fetch('/data');
+    const greeting = await response.text();
+    document.getElementById('hello-container').innerText = greeting;
+}
+/**
+ * Fetches messages from the servers and adds them to the DOM.
+ */
+async function getComments() {
+    fetch('/data').then(response => response.json()).then((msgs) => {
+   
+    const statsListElement = document.getElementById('comments-container');
+    statsListElement.innerHTML = '';
+    msgs.forEach((msg) => {
+        statsListElement.appendChild(
+            createListElement(msg.sender + ': ' + msg.message));
+    })
+    
+  });
+}
+
+/** Creates an <li> element containing text. */
+function createListElement(text) {
+  const liElement = document.createElement('li');
+  liElement.innerText = text;
+  return liElement;
+}
+
+function deleteData(){
+    fetch('/delete-data', {method: 'POST'}).then(getComments());
 }
