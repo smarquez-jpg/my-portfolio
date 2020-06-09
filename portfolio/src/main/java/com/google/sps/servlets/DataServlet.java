@@ -14,6 +14,8 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -37,13 +39,12 @@ import java.util.List;
 public class DataServlet extends HttpServlet {
     /*TODO move class into own file*/
     public class CommentMessage {
-    private String sender; 
-    private String message;
-    private String recipient;
-    public CommentMessage(String sndr, String msg){
-        sender = sndr;
-        message = msg;
-    }
+        private String sender; 
+        private String message;
+        public CommentMessage(String sndr, String msg){
+            sender = sndr;
+            message = msg;
+        }
     }
     public List<CommentMessage> messages = new ArrayList<>();
     int numberOfCommentsToDisplay = 0;
@@ -72,9 +73,12 @@ public class DataServlet extends HttpServlet {
             return;
         }
         for(int i = 0; i < numberOfCommentsToDisplay; i++){
+
             limitedMessages.add(messages.get(i));
         }
+
         response.getWriter().println(gson.toJson(limitedMessages));
+
     }
     
 
@@ -105,7 +109,7 @@ public class DataServlet extends HttpServlet {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(commentEntity);
 
-    // Redirect back to the HTML page.
+        // Redirect back to the HTML page.
         response.sendRedirect("/index.html");
     }
 
@@ -123,15 +127,15 @@ public class DataServlet extends HttpServlet {
 
     /* Returns number of comments to display */
     private int getNumberOfCommentsToDisplay(HttpServletRequest request) {
-    // Get the input from the form.
+        // Get the input from the form.
         String numberOfCommentsString = request.getParameter("comments-choice");
-    // Convert the input to an int.
+        // Convert the input to an int.
         int numberOfComments;
         try {
-        numberOfComments = Integer.parseInt(numberOfCommentsString);
+            numberOfComments = Integer.parseInt(numberOfCommentsString);
         } catch (NumberFormatException e) {
-        System.err.println("Could not convert to int: " + numberOfCommentsString);
-        return -1;
+            System.err.println("Could not convert to int: " + numberOfCommentsString);
+            return -1;
         }
         return numberOfComments;
     }
