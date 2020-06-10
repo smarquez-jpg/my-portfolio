@@ -41,9 +41,11 @@ public class DataServlet extends HttpServlet {
     public class CommentMessage {
         private String sender; 
         private String message;
-        public CommentMessage(String sndr, String msg){
+        private String imgUrl;
+        public CommentMessage(String sndr, String msg, String img){
             sender = sndr;
             message = msg;
+            imgUrl = img;
         }
     }
     public List<CommentMessage> messages = new ArrayList<>();
@@ -52,7 +54,6 @@ public class DataServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
-        
         Query query = new Query("Comment").addSort("time", SortDirection.DESCENDING);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         PreparedQuery results = datastore.prepare(query);
@@ -60,10 +61,9 @@ public class DataServlet extends HttpServlet {
         for (Entity entity : results.asIterable()) {
             String comment = (String) entity.getProperty("text");
             String sender = (String) entity.getProperty("sender");
-            CommentMessage nComment = new CommentMessage(sender, comment);
+            String image = (String) entity.getProperty("imgUrl");
+            CommentMessage nComment = new CommentMessage(sender, comment, image);
             messages.add(nComment);
-            
-            
         }
         Gson gson = new Gson();
         response.setContentType("application/json;");
@@ -100,7 +100,7 @@ public class DataServlet extends HttpServlet {
         response.getWriter().println(text);
 
         // Add comment to datastore
-        long timestamp = System.currentTimeMillis();
+        /*long timestamp = System.currentTimeMillis();
 
         Entity commentEntity = new Entity("Comment");
         commentEntity.setProperty("sender", "Steven");
@@ -110,7 +110,7 @@ public class DataServlet extends HttpServlet {
         datastore.put(commentEntity);
 
         // Redirect back to the HTML page.
-        response.sendRedirect("/index.html");
+        response.sendRedirect("/index.html");*/
     }
 
   /**
