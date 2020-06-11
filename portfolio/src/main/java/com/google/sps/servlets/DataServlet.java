@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-//import CommentMessage;
 
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
@@ -57,7 +56,6 @@ public class DataServlet extends HttpServlet {
         Query query = new Query("Comment").addSort("time", SortDirection.DESCENDING);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         PreparedQuery results = datastore.prepare(query);
-
         for (Entity entity : results.asIterable()) {
             String comment = (String) entity.getProperty("text");
             String sender = (String) entity.getProperty("sender");
@@ -76,7 +74,6 @@ public class DataServlet extends HttpServlet {
 
             limitedMessages.add(messages.get(i));
         }
-
         response.getWriter().println(gson.toJson(limitedMessages));
 
     }
@@ -98,19 +95,6 @@ public class DataServlet extends HttpServlet {
         // Respond with the result.
         response.setContentType("text/html;");
         response.getWriter().println(text);
-
-        // Add comment to datastore
-        /*long timestamp = System.currentTimeMillis();
-
-        Entity commentEntity = new Entity("Comment");
-        commentEntity.setProperty("sender", "Steven");
-        commentEntity.setProperty("text", text);
-        commentEntity.setProperty("time", timestamp);
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        datastore.put(commentEntity);
-
-        // Redirect back to the HTML page.
-        response.sendRedirect("/index.html");*/
     }
 
   /**
@@ -119,7 +103,7 @@ public class DataServlet extends HttpServlet {
    */
     private String getParameter(HttpServletRequest request, String name, String defaultValue) {
         String value = request.getParameter(name);
-        if (value.equals(null)) {
+        if (value == null) {
             return defaultValue;
         }
         return value;

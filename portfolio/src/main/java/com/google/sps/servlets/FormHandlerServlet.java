@@ -39,11 +39,10 @@ public class FormHandlerServlet extends HttpServlet {
     // Get the URL of the image that the user uploaded to Blobstore.
     String imageUrl = getUploadedFileUrl(request, "image");
 
-    // Output some HTML that shows the data the user entered.
-    // A real codebase would probably store these in Datastore.
-
+    //get system time
     long timestamp = System.currentTimeMillis();
 
+    //store image and comment in datastore
     Entity commentEntity = new Entity("Comment");
     commentEntity.setProperty("sender", "Steven");
     commentEntity.setProperty("text", message);
@@ -54,13 +53,6 @@ public class FormHandlerServlet extends HttpServlet {
 
     // Redirect back to the HTML page.
     response.sendRedirect("/index.html");
-    /*PrintWriter out = response.getWriter();
-    out.println("<p>Here's the image you uploaded:</p>");
-    out.println("<a href=\"" + imageUrl + "\">");
-    out.println("<img src=\"" + imageUrl + "\" />");
-    out.println("</a>");
-    out.println("<p>Here's the text you entered:</p>");
-    out.println(message);*/
   }
 
   /** Returns a URL that points to the uploaded file, or null if the user didn't upload a file. */

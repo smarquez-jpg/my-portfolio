@@ -43,6 +43,7 @@ async function getComments() {
     msgs.forEach((msg) => {
         statsListElement.appendChild(
             createListElement(msg.sender + ': ' + msg.message));
+            createImgElement(msg.imgUrl);
     })
     
   });
@@ -52,6 +53,12 @@ async function getComments() {
 function createListElement(text) {
   const liElement = document.createElement('li');
   liElement.innerText = text;
+  return liElement;
+}
+/** Creates an <img> element containing text. */
+function createImgElement(text) {
+  const imgElement = document.createElement('img');
+  imgElement.source = text;
   return liElement;
 }
 
@@ -69,4 +76,10 @@ function fetchBlobstoreUrlAndShowForm() {
         messageForm.action = imageUploadUrl;
         messageForm.classList.remove('hidden');
       });
+}
+/** Creates a map and adds it to the page. */
+function createMap() {
+  const map = new google.maps.Map(
+      document.getElementById('map'),
+      {center: {lat: 37.422, lng: -122.084}, zoom: 16});
 }
