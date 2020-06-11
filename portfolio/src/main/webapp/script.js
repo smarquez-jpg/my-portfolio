@@ -43,7 +43,8 @@ async function getComments() {
     msgs.forEach((msg) => {
         statsListElement.appendChild(
             createListElement(msg.sender + ': ' + msg.message));
-            createImgElement(msg.imgUrl);
+        statsListElement.appendChild(
+            createImgElement(msg.imgUrl));
     })
     
   });
@@ -58,8 +59,8 @@ function createListElement(text) {
 /** Creates an <img> element containing text. */
 function createImgElement(text) {
   const imgElement = document.createElement('img');
-  imgElement.source = text;
-  return liElement;
+  imgElement.src = text;
+  return imgElement;
 }
 
 function deleteData(){

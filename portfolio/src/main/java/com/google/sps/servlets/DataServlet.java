@@ -47,12 +47,13 @@ public class DataServlet extends HttpServlet {
             imgUrl = img;
         }
     }
-    public List<CommentMessage> messages = new ArrayList<>();
+    
     int numberOfCommentsToDisplay = 0;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        
+        System.out.println("here");
+        /*List<CommentMessage> messages = new ArrayList<>();
         Query query = new Query("Comment").addSort("time", SortDirection.DESCENDING);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         PreparedQuery results = datastore.prepare(query);
@@ -66,8 +67,48 @@ public class DataServlet extends HttpServlet {
         Gson gson = new Gson();
         response.setContentType("application/json;");
         List<CommentMessage> limitedMessages = new ArrayList<>();
+        System.out.println("first");
         if(numberOfCommentsToDisplay == 0){
-            response.getWriter().println(gson.toJson(limitedMessages));
+            response.getWriter().println(gson.toJson(messages));
+            return;
+        }
+        for(int i = 0; i < numberOfCommentsToDisplay; i++){
+
+            limitedMessages.add(messages.get(i));
+        }
+        response.getWriter().println(gson.toJson(limitedMessages));*/
+
+        // Get the input from the form.
+        System.out.println("test");
+        String text = getParameter(request, "text-input", "");
+        numberOfCommentsToDisplay = getNumberOfCommentsToDisplay(request);
+        //System.out.println(numberOfCommentsToDisplay);
+        if (numberOfCommentsToDisplay < 1 || numberOfCommentsToDisplay > 100) {
+            response.setContentType("text/html");
+            response.getWriter().println("Please enter an integer between 1 and 100.");
+            return;
+        }
+        // Respond with the result.
+        //response.setContentType("text/html;");
+        //response.getWriter().println(text);
+
+        List<CommentMessage> messages = new ArrayList<>();
+        Query query = new Query("Comment").addSort("time", SortDirection.DESCENDING);
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        PreparedQuery results = datastore.prepare(query);
+        for (Entity entity : results.asIterable()) {
+            String comment = (String) entity.getProperty("text");
+            String sender = (String) entity.getProperty("sender");
+            String image = (String) entity.getProperty("imgUrl");
+            CommentMessage nComment = new CommentMessage(sender, comment, image);
+            messages.add(nComment);
+        }
+        Gson gson = new Gson();
+        response.setContentType("application/json;");
+        List<CommentMessage> limitedMessages = new ArrayList<>();
+        System.out.println("first");
+        if(numberOfCommentsToDisplay == 0){
+            response.getWriter().println(gson.toJson(messages));
             return;
         }
         for(int i = 0; i < numberOfCommentsToDisplay; i++){
@@ -85,16 +126,43 @@ public class DataServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Get the input from the form.
+        /*System.out.println("test");
         String text = getParameter(request, "text-input", "");
         numberOfCommentsToDisplay = getNumberOfCommentsToDisplay(request);
+        //System.out.println(numberOfCommentsToDisplay);
         if (numberOfCommentsToDisplay < 1 || numberOfCommentsToDisplay > 100) {
             response.setContentType("text/html");
             response.getWriter().println("Please enter an integer between 1 and 100.");
             return;
         }
         // Respond with the result.
-        response.setContentType("text/html;");
-        response.getWriter().println(text);
+        //response.setContentType("text/html;");
+        //response.getWriter().println(text);
+
+        List<CommentMessage> messages = new ArrayList<>();
+        Query query = new Query("Comment").addSort("time", SortDirection.DESCENDING);
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        PreparedQuery results = datastore.prepare(query);
+        for (Entity entity : results.asIterable()) {
+            String comment = (String) entity.getProperty("text");
+            String sender = (String) entity.getProperty("sender");
+            String image = (String) entity.getProperty("imgUrl");
+            CommentMessage nComment = new CommentMessage(sender, comment, image);
+            messages.add(nComment);
+        }
+        Gson gson = new Gson();
+        response.setContentType("application/json;");
+        List<CommentMessage> limitedMessages = new ArrayList<>();
+        System.out.println("first");
+        if(numberOfCommentsToDisplay == 0){
+            response.getWriter().println(gson.toJson(messages));
+            return;
+        }
+        for(int i = 0; i < numberOfCommentsToDisplay; i++){
+
+            limitedMessages.add(messages.get(i));
+        }
+        response.getWriter().println(gson.toJson(limitedMessages));*/
     }
 
   /**
@@ -112,14 +180,16 @@ public class DataServlet extends HttpServlet {
     /* Returns number of comments to display */
     private int getNumberOfCommentsToDisplay(HttpServletRequest request) {
         // Get the input from the form.
-        String numberOfCommentsString = request.getParameter("comments-choice");
+        //String numberOfCommentsString = request.getParameter("comments-choice");
+        String numberOfCommentsString = getParameter(request, "comments-choice", "1");
+        System.out.println(numberOfCommentsString);
         // Convert the input to an int.
         int numberOfComments;
         try {
             numberOfComments = Integer.parseInt(numberOfCommentsString);
         } catch (NumberFormatException e) {
             System.err.println("Could not convert to int: " + numberOfCommentsString);
-            return -1;
+            return 1;
         }
         return numberOfComments;
     }

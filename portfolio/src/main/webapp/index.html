@@ -35,10 +35,11 @@
                 <input type="number" name="comments-choice" id="comments-choice" min="1" max="100" value="1">
                 <br/><br/>
                 
-                <input type="submit" onclick="getComments()"/>
+                <input type="submit"/>
             </form>
+            <button onclick="getComments()">Show Comments</button>
         </body>
-        <div id="comments-container"></div>
+        <div id="comments-container" onload="getComments()"></div>
         <form action="/delete-data" method="POST">
             <button onclick="deleteData()">Delete Comments</button>
         </form>
