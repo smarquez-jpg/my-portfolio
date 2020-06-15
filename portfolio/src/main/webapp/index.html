@@ -24,7 +24,7 @@
       <button onclick="addRandomGreeting()">Hello</button>
       <div id="greeting-container"></div>
       <body onload="fetchBlobstoreUrlAndShowForm()">
-        <form action="/data" id="my-form" enctype="multipart/form-data" method="POST">
+        <form id="my-form" enctype="multipart/form-data" method="POST">
           <p>Enter your comment here:</p>
           <textarea name="text-input">Your text here</textarea>
           <br/><br/>
@@ -39,7 +39,7 @@
         </form>
         <button onclick="getComments()">Show Comments</button>
       </body>
-      <div id="comments-container" onload="getComments()"></div>
+      <div id="comments-container"></div>
       <form action="/delete-data" method="POST">
           <button onclick="deleteData()">Delete Comments</button>
       </form>
