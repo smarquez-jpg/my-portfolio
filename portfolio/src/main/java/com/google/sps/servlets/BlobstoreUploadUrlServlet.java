@@ -23,5 +23,6 @@ public class BlobstoreUploadUrlServlet extends HttpServlet {
 
     response.setContentType("text/html");
     response.getWriter().println(uploadUrl);
+    
   }
 }
