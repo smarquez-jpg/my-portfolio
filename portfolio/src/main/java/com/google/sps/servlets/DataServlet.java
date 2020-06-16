@@ -57,10 +57,11 @@ public class DataServlet extends HttpServlet {
           imgUrl = img;
         }
     }
+
+    int numberOfCommentsToDisplay = 0;
     
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-      int numberOfCommentsToDisplay = getNumberOfCommentsToDisplay(request);
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {      
       if (numberOfCommentsToDisplay < 1 || numberOfCommentsToDisplay > 100) {
         response.setContentType("text/html");
         response.getWriter().println("Please enter an integer between 1 and 100.");
@@ -100,6 +101,9 @@ public class DataServlet extends HttpServlet {
       // Get the message entered by the user.
       String message = request.getParameter("text-input");
 
+      //get number of comments
+      numberOfCommentsToDisplay = getNumberOfCommentsToDisplay(request);
+
       // Get the URL of the image that the user uploaded to Blobstore.
       String imageUrl = getUploadedFileUrl(request, "image");
 
@@ -114,7 +118,6 @@ public class DataServlet extends HttpServlet {
       commentEntity.setProperty("time", timestamp);
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
       datastore.put(commentEntity);
-
       // Redirect back to the HTML page.
       response.sendRedirect("/index.html");
     }
