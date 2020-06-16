@@ -43,6 +43,8 @@ async function getComments() {
     msgs.forEach((msg) => {
         statsListElement.appendChild(
             createListElement(msg.sender + ': ' + msg.message));
+        statsListElement.appendChild(
+            createImgElement(msg.imgUrl));
     })
     
   });
@@ -54,7 +56,31 @@ function createListElement(text) {
   liElement.innerText = text;
   return liElement;
 }
+/** Creates an <img> element containing text. */
+function createImgElement(text) {
+  const imgElement = document.createElement('img');
+  imgElement.src = text;
+  return imgElement;
+}
 
 function deleteData(){
     fetch('/delete-data', {method: 'POST'}).then(getComments());
+}
+
+function fetchBlobstoreUrlAndShowForm() {
+  fetch('/blobstore-upload-url')
+      .then((response) => {
+        return response.text();
+      })
+      .then((imageUploadUrl) => {
+        const messageForm = document.getElementById('my-form');
+        messageForm.action = imageUploadUrl;
+        messageForm.classList.remove('hidden');
+      });
+}
+/** Creates a map and adds it to the page. */
+function createMap() {
+  const map = new google.maps.Map(
+      document.getElementById('map'),
+      {center: {lat: 37.422, lng: -122.084}, zoom: 16});
 }
