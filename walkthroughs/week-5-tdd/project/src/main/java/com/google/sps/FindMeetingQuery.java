@@ -31,6 +31,16 @@ public final class FindMeetingQuery {
       TimeRange afterEvent = TimeRange.fromStartEnd(event.getWhen().end(), TimeRange.END_OF_DAY, true);
       options.add(afterEvent);
     }
-    return options;
+    Collection<TimeRange> updatedOptions = new ArrayList<>();
+    for(TimeRange firstTime : options){
+      for(TimeRange secondTime : options){
+        if(firstTime.overlaps(secondTime) && !(firstTime.equals(secondTime))){
+          TimeRange newOption = TimeRange.fromStartEnd(Math.max(firstTime.start(), secondTime.start()), Math.min(firstTime.end(), secondTime.end()), false);
+          if(!updatedOptions.contains(newOption)) updatedOptions.add(newOption);
+        }
+      }
+    }
+    if(updatedOptions.size() == 0) return options;
+    else return updatedOptions;
   }
 }
