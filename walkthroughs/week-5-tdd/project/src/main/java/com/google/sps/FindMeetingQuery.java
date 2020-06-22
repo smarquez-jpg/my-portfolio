@@ -19,28 +19,59 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    if(events.equals(Collections.emptySet())) return Arrays.asList(TimeRange.WHOLE_DAY);
     if(request.getDuration() > TimeRange.WHOLE_DAY.duration()) return Arrays.asList();
-    Collection<TimeRange> options = new ArrayList<>();
+    if(events.equals(Collections.emptySet())) return Arrays.asList(TimeRange.WHOLE_DAY);
+    //create List freeTime to hold the free time before and after an event
+    List<TimeRange> freeTime = new ArrayList<>();
     for(Event event : events){
       TimeRange beforeEvent = TimeRange.fromStartEnd(TimeRange.START_OF_DAY, event.getWhen().start(), false);
-      options.add(beforeEvent);
       TimeRange afterEvent = TimeRange.fromStartEnd(event.getWhen().end(), TimeRange.END_OF_DAY, true);
-      options.add(afterEvent);
+      Set<String> modifiedAttendees = new HashSet<>(request.getAttendees());
+      modifiedAttendees.retainAll(event.getAttendees());
+      Set<String> optionalAttendees = new HashSet<>(request.getOptionalAttendees());
+      if(modifiedAttendees.size() >= 1){
+        freeTime.add(beforeEvent);
+        freeTime.add(afterEvent);
+      } else {
+        TimeRange allDay = TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.END_OF_DAY, true);
+        freeTime.add(allDay);
+      }
     }
-    Collection<TimeRange> updatedOptions = new ArrayList<>();
-    for(TimeRange firstTime : options){
-      for(TimeRange secondTime : options){
-        if(firstTime.overlaps(secondTime) && !(firstTime.equals(secondTime))){
-          TimeRange newOption = TimeRange.fromStartEnd(Math.max(firstTime.start(), secondTime.start()), Math.min(firstTime.end(), secondTime.end()), false);
-          if(!updatedOptions.contains(newOption)) updatedOptions.add(newOption);
+    //create List of updated options that take into account different circumstances
+    //ex: overlapping events
+    List<TimeRange> updatedOptions = new ArrayList<>();
+    for(int i = 0; i < freeTime.size(); i++){
+      TimeRange firstTime = freeTime.get(i);
+      for(int j = i+1; j < freeTime.size(); j++){
+        TimeRange secondTime = freeTime.get(j);
+        if(firstTime.overlaps(secondTime)){
+          int startTime = Math.max(firstTime.start(), secondTime.start());
+          int endTime = Math.min(firstTime.end(), secondTime.end());
+          TimeRange newOption = TimeRange.fromStartEnd(startTime, endTime, false);
+          if(!updatedOptions.contains(newOption) && startTime != endTime) updatedOptions.add(newOption);
         }
       }
     }
-    if(updatedOptions.size() == 0) return options;
-    else return updatedOptions;
+    //if there is anything in updatedOptions, return those options
+    if(updatedOptions.size() == 0) {
+      for(int i = 0; i < freeTime.size(); i++){
+        TimeRange time = freeTime.get(i);
+        if(time.duration() < request.getDuration()) freeTime.remove(time);
+      }    
+      return freeTime;
+    } else {
+      for(int i = 0; i < updatedOptions.size(); i++){
+        TimeRange time = updatedOptions.get(i);
+        if(time.duration() < request.getDuration()) updatedOptions.remove(time);
+      } 
+      return updatedOptions;
+    }
   }
 }
